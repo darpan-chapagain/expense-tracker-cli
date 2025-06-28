@@ -5,12 +5,13 @@ FILENAME = "expenses.txt"
 def add_expense():
     description = input("What did you spend on?").strip()
     amount = input("How much?").strip()
+    category = input("What's the category?").strip().capitalize()
     
     if not amount.replace('.', '', 1).isdigit():
         print("Amount must be a number")
         return
     
-    entry = f"{description} - ${amount}"
+    entry = f"{description} - ${amount} - {category}"
     expenses.append(entry)
 
     with open(FILENAME, "a") as file:
@@ -27,6 +28,32 @@ def view_expense():
         for item in expenses:
             print("*", item)
 
+def show_summary():
+    totals = {}
+
+    for entry in expenses:
+        parts = entry.split("-")
+
+        if len(parts) != 3:
+            continue
+
+        description = parts[0]
+        raw_amount = parts[1]
+        category = parts[2]
+
+        amount = float(raw_amount.strip().replace("$", ""))
+
+        if category not in totals:
+            totals[category] = 0 
+
+        totals[category] += amount
+
+    overall = 0
+    print("Expense Summary by category")
+    for cat, total in totals.items():
+        print(f"* {cat}: ${total: .2f}")
+        overall += total
+    print("Total Spent: $", round(overall, 2))
 
 def load_expenses():
     try:
@@ -46,13 +73,16 @@ def main_menu():
     print("Welcome to the Expense Tracker CLI")
 
     while True: 
-        command = input("What would you like to do? (add/view/exit):").strip().lower()
+        command = input("What would you like to do? (add/view/summary/exit):").strip().lower()
 
         if command == "add":
             add_expense()
             
         elif command == "view":
             view_expense()
+
+        elif command == "summary":
+            show_summary()
             
         elif command == "exit":
             print("Goodbye")
