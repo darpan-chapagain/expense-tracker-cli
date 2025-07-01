@@ -1,19 +1,12 @@
+from file_utils import load_expenses, save_expenses
+
 class ExpenseTracker:
     def __init__(self, filename="expenses.txt"):
         self.__expenses = []
         self.__filename = filename
 
-    def load_expenses(self):
-        try: 
-            with open (self.__filename, "r") as file:
-                for line in file: 
-                    self.__expenses.append(line.strip())
-            if self.__expenses:
-                print("Previous Expenses:")
-                for item in self.__expenses:
-                    print("*", item)
-        except FileNotFoundError:
-            print("File not found")
+    def load(self):
+        self.__expenses = load_expenses(self.__filename)
 
     def add_expenses(self):
         description = input("What did you spend on?").strip()
@@ -27,8 +20,7 @@ class ExpenseTracker:
         entry = f"{description} - ${amount} - {category}"
         self.__expenses.append(entry)
 
-        with open(self.__filename, "a") as file:
-            file.write(entry + "\n")
+        save_expenses(self.__filename, entry)
 
         print("Expense added!")
 
@@ -65,30 +57,6 @@ class ExpenseTracker:
             overall += total
 
         print(f"\n💵 Total Spent: ${round(overall, 2)}")
-
-    def run(self):
-        self.load_expenses()
-        print("Welcome to the OOP Expense Tracker CLI!")
-
-        while True:
-            command = input("\nWhat would you like to do? (add/view/summary/exit): ").strip().lower()
-
-            if command == "add":
-                self.add_expenses()
-            elif command == "view":
-                self.view_expense()
-            elif command == "summary":
-                self.show_summary()
-            elif command == "exit":
-                print("Goodbye!")
-                break
-            else:
-                print("Invalid command. Please choose add, view, summary, or exit.")
-
-if __name__ == "__main__":
-    tracker = ExpenseTracker()
-    tracker.run()
-
         
 
 
